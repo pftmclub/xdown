@@ -54,7 +54,23 @@ function startHttp() {
 	console.log('xdownCrxInit:',xTimestamp);
 ```
 
--  获取当前CRX的版本号     localStorage.getItem('xdown-version');   当前最新为1.0.2
--  获取当前CRX初始化时间戳 localStorage.getItem('xdown-timestamp'); 比如 1569221353668
+-  获取XDown的版本号     localStorage.getItem('xdown-version');   当前最新为1.0.2
+-  获取XDown初始化时间戳 localStorage.getItem('xdown-timestamp'); 比如 1569221353668
+
+
+- js获取XDown的参数设置
+
+```
+	let xEnabled = localStorage.getItem('xdown-enabled');
+	console.log('xdownCrxEnabled:',xEnabled);
+	
+	let xSuffixData = localStorage.getItem('xdown-file-suffix-data');
+	console.log('xdownCrxData:',xSuffixData);
+```
+
+- 获取XDown选项参数是否启用  localStorage.getItem('xdown-enabled'); 返回值为 '1' 启用, '0' 禁用
+- 获取XDown选项中的参数 localStorage.getItem('xdown-file-suffix-data'); 默认将 ; , | 替换为空格
+
+
 
 

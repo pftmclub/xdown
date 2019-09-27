@@ -216,40 +216,50 @@ self.onmessage=${workerMessageHandler}`
 
 	const template = `
 	<div class="xdown-box" :class="{'dark':dark}">
-	<div class="t-center fs-14px" v-text="xdownVersion"></div>
-	<div @click="hide=!hide" class="box-toggle t-center fs-14px" v-text="strings.togglelinks"></div>
-	<div :class="{'hide':hide}">
-		<div class="t-center fs-14px" v-text="strings.videoid+videoId"></div>
-		<div class="d-flex">
-			<div class="f-1 of-h">
-				<div class="t-center fs-14px xdown-file-name"  v-text="xdownFileName">
-				</div>
-				<div class="video-item-div">
-					<div class="file-ext-div" v-for="(item,index) in xdownExt['video']">
-						<input type="radio" :id="item" name="videoFormat" :value="item" v-model="xdownVideoValue">
-						<label :for="item">{{ item }}</label>
+	<div class="fs-14px" :class="{'hide':xdownCrx }">
+		未安装<a href="https://xdown.org">XDown</a>插件 &nbsp;&nbsp;
+		<a target="_blank" href="https://chrome.google.com/webstore/detail/xdown/eapmjcdkdlenhkbanlgacimfibbbiinc">
+			安装插件
+		</a>
+	</div>
+	<div class="fs-14px" :class="{'hide':!xdownCrx }">
+		<div class="t-center fs-14px" :class="{'hide': videoId && xdownCrx }" v-text="'XDown-YouTube正在解析'"></div>
+		<div class="t-center fs-14px" :class="{'hide': !videoId && xdownCrx}" v-text="strings.videoid+videoId"></div>
+	</div>
+	<div :class="{'hide':(!xdownCrx || !videoId) }">
+		<div @click="hide=!hide" class="box-toggle t-center fs-14px" v-text="strings.togglelinks"></div>
+		<div :class="{'hide':hide}">
+			<div class="d-flex">
+				<div class="f-1 of-h">
+					<div class="t-center fs-14px xdown-file-name"  v-text="xdownFileName">
 					</div>
-					<div class="f-1 of-h" v-for="linkItem in xdownVideo">
-						<button class="ytdl-link-btn fs-14px" @click="startDownVideoItem(linkItem)">
-							 {{ displayDownVideoItem(linkItem) }}
-						</button>
+					<div class="video-item-div">
+						<div class="file-ext-div" v-for="(item,index) in xdownExt['video']">
+							<input type="radio" :id="item" name="videoFormat" :value="item" v-model="xdownVideoValue">
+							<label :for="item">{{ item }}</label>
+						</div>
+						<div class="f-1 of-h" v-for="linkItem in xdownVideo">
+							<button class="ytdl-link-btn fs-14px" @click="startDownVideoItem(linkItem)">
+								 {{ displayDownVideoItem(linkItem) }}
+							</button>
+						</div>
 					</div>
-				</div>
-				<div class="audio-item-div">
-					<div class="file-ext-div" v-for="(item,index) in xdownExt['audio']">
-						<input type="radio" :id="item" name="audioFormat" :value="item" v-model="xdownAudioValue">
-						<label :for="item">{{ item }}</label>
-					</div>
-					<div class="f-1 of-h" v-for="linkItem in xdownAudio">
-						<button class="ytdl-link-btn fs-14px" @click="startDownAudioItem(linkItem)">
-							 {{ displayDownAudioItem(linkItem) }}
-						</button>
+					<div class="audio-item-div">
+						<div class="file-ext-div" v-for="(item,index) in xdownExt['audio']">
+							<input type="radio" :id="item" name="audioFormat" :value="item" v-model="xdownAudioValue">
+							<label :for="item">{{ item }}</label>
+						</div>
+						<div class="f-1 of-h" v-for="linkItem in xdownAudio">
+							<button class="ytdl-link-btn fs-14px" @click="startDownAudioItem(linkItem)">
+								 {{ displayDownAudioItem(linkItem) }}
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-</div>
+	</div>
 `.slice(1)
 	const app = new Vue({
 		data() {
@@ -258,7 +268,9 @@ self.onmessage=${workerMessageHandler}`
 				videoId: '',
 				stream: [],
 				adaptive: [],
-				xdownVersion: '',
+				xdownCrx: false,
+				xdownVersionVal: '',
+				xdownVersionTxt: '',
 				xdownFileName: 'unknown',
 				xdownLengthSeconds: 0,
 				xdownVideo: [],
@@ -442,9 +454,13 @@ self.onmessage=${workerMessageHandler}`
 			let xTimesamp = localStorage.getItem('xdown-timestamp');
 			let xVersion = localStorage.getItem('xdown-version');
 			if(!xVersion) {
-				app.xdownVersion = '未安装xdown浏览器CRX插件!';
+				app.xdownCrx = false;
+				app.xdownVersionVal = '';
+				app.xdownVersionTxt = '未安装CRX插件!';
 			} else {
-				app.xdownVersion = 'CRX插件版本:' + xVersion 
+				app.xdownCrx = true;
+				app.xdownVersionVal = xVersion;
+				app.xdownVersionTxt = 'CRX插件版本:' + xVersion;
 				if(xTimesamp && xTimesamp.length == 13 && !isNaN(xTimesamp)) {
 					let tmpDate = new Date(parseFloat(xTimesamp));
 					if(tmpDate) {
@@ -699,6 +715,7 @@ self.onmessage=${workerMessageHandler}`
 	overflow: hidden;
 }
 .xdown-box{
+	margin-top: 4px;
 	border-bottom: 1px solid var(--yt-border-color);
 	font-family: Arial;
 	border: solid 1px #3153b3;
